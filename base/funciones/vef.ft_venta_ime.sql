@@ -20,6 +20,7 @@ $body$
  ISSUE            FECHA:		      AUTOR               DESCRIPCION
  #0              01/06/2016        JRR                 Creacion 
  #123            25/09/2018        RAC                 Se adicionan datos de proveedor al guardar la factura  
+ #38             20/12/2019        JRR                 Integracion SIAT
     
   ***************************************************************************/
 
@@ -123,7 +124,8 @@ $body$
     v_total_venta_ncd       numeric; --#123
     v_importe_codigo_control    numeric; --#123
     v_tipo_dosificacion         varchar; --#123
-
+    v_integracion_siat          varchar;
+    v_cuf                       varchar;      
 
   BEGIN
 
@@ -1618,7 +1620,8 @@ $body$
        $this->setParametro('obs','obs','text');
        $this->setParametro('json_procesos','json_procesos','text');
        */
-       
+        /*Verificar si existe integracion con siat*/
+        v_integracion_siat = pxp.f_get_variable_global_defecto('vef_integacion_siat','no');
        
         select
           ew.id_tipo_estado ,
@@ -1747,15 +1750,16 @@ $body$
           --por que  valida al insertar la factura, donde se genera el nro de la factura
           END IF;
           
+          --si hay integracion con siat no neesitamos obtener la actividad economica
           -- #123 si no es una nota de credito botiene de sucusal producto la actividad economica 
-          IF v_ncd = 'no' THEN  
+          IF v_integracion_siat = 'no' and v_ncd = 'no' THEN  
               select array_agg(distinct cig.id_actividad_economica) into v_id_actividad_economica
               from vef.tventa_detalle vd
                 inner join vef.tsucursal_producto sp on vd.id_sucursal_producto = sp.id_sucursal_producto
                 inner join param.tconcepto_ingas cig on  cig.id_concepto_ingas = sp.id_concepto_ingas
               where vd.id_venta = v_venta.id_venta and vd.estado_reg = 'activo';
               v_tipo_dosificacion = 'F';-- #123
-          ELSE  
+          ELSIF  v_integracion_siat = 'no' THEN
              --#123 para notas de credito la actividad economica se dereiva de la factura relacionada
              
              select array_agg(distinct cig.id_actividad_economica) into v_id_actividad_economica
@@ -1769,9 +1773,9 @@ $body$
              --raise exception 'v_id_actividad_economica.....(%)',v_id_actividad_economica; 
           
           END IF;
-          --genera el numero de factura
+          --genera el numero de factura 
 
-          IF v_venta.tipo_factura not in ('computarizadaexpo','computarizadaexpomin','computarizadamin','computarizadareg') THEN  --#123 se agrega el tipo computarizadareg
+          IF v_integracion_siat = 'no' and v_venta.tipo_factura not in ('computarizadaexpo','computarizadaexpomin','computarizadamin','computarizadareg') THEN  --#123 se agrega el tipo computarizadareg
 			
                 select d.* into v_dosificacion
                 from vef.tdosificacion d
@@ -1818,7 +1822,7 @@ $body$
                 where id_dosificacion = v_dosificacion.id_dosificacion;
 
 
-          ELSE
+          ELSIF v_integracion_siat = 'no' THEN
               -- en las facturas de exportacion y minera  el numero se genera al inserta
               -- #123 amtien la facturas computarizadareg,    añaden la fecha al isnertar el documento en borrador
               v_nro_factura =  v_venta.nro_factura;
@@ -1840,7 +1844,9 @@ $body$
                                                       to_char(v_fecha_venta,'YYYYMMDD')::varchar,
                                                       round(v_venta.total_venta_msuc,0))
               where id_venta = v_venta.id_venta;
-
+          ELSE
+              --Este funcion actualiza el numero de factura, cuf y realiza validaciones de siat
+              v_cuf = vef.f_integracion_siat (v_venta.id_venta, p_id_usuario);
 
           END IF;
           
