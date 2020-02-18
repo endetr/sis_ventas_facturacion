@@ -1169,3 +1169,55 @@ ALTER TABLE vef.ttemporal_data
 ALTER TABLE vef.tsucursal
   ALTER COLUMN telefono TYPE VARCHAR(150);
 /************************************F-SCP-EGS-VEF-4-12/08/2019*************************************************/
+
+
+/************************************I-SCP-RAC-VEF-8-18/02/2020*************************************************/
+ 
+ ALTER TABLE vef.tcliente
+  ADD COLUMN codigo_sin VARCHAR(10) DEFAULT 1 NOT NULL;
+
+COMMENT ON COLUMN vef.tcliente.codigo_sin
+IS 'codigo otorgado por servicio de impuestos';
+
+ 
+ 
+ALTER TABLE vef.tcliente
+  ADD COLUMN id_tipo_documento INTEGER;
+
+
+ALTER TABLE vef.tsucursal
+  ADD COLUMN tipo_doc_fiscal SMALLINT DEFAULT 1 NOT NULL;
+
+COMMENT ON COLUMN vef.tsucursal.tipo_doc_fiscal
+IS 'Parámetro var3 representa el TIPO DE DOCUMENTO FISCAL , código otorgado por impuestos.';
+
+ALTER TABLE vef.tsucursal
+  ADD COLUMN tipo_doc_sector SMALLINT DEFAULT 1 NOT NULL;
+
+COMMENT ON COLUMN vef.tsucursal.tipo_doc_sector
+IS 'Parámetro var4 representa el TIPO DOCUMENTO SECTOR, codigo otorgado por impuestos.';
+
+
+ALTER TABLE vef.tventa
+  ADD COLUMN cuf VARCHAR(50);
+
+COMMENT ON COLUMN vef.tventa.cuf
+IS 'Código cuf en ves del código de control, nuevo codigo unico de factura';
+
+
+ALTER TABLE vef.tventa
+  ADD COLUMN codigo_sin VARCHAR;
+
+ALTER TABLE vef.tventa
+  ADD COLUMN codigo_motivo_anulacion NUMERIC;
+
+COMMENT ON COLUMN vef.tventa.codigo_motivo_anulacion
+IS 'Codigo de la tabla motivo anulacion';
+
+
+
+ 
+ 
+
+/************************************F-SCP-RAC-VEF-8-18/02/2020*************************************************/
+
