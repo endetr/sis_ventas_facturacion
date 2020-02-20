@@ -5,7 +5,11 @@
 *@author  (admin)
 *@date 21-04-2015 03:18:44
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
-*/
+	#ISSUE                FECHA                AUTOR                DESCRIPCION
+	#9EndeEtr             18/02/2020            EGS                  Se agrega campo codigo sin
+ * 
+ 
+ * */
 
 class MODSucursalProducto extends MODbase{
 	
@@ -51,7 +55,7 @@ class MODSucursalProducto extends MODbase{
 		$this->captura('nandina','VARCHAR');
 		$this->captura('ruta_foto','VARCHAR');
 		$this->captura('codigo','VARCHAR');
-		
+		$this->captura('codigo_sin','VARCHAR');//#9
 		
 		
 		
@@ -150,6 +154,7 @@ class MODSucursalProducto extends MODbase{
 		$this->setParametro('desc_unidad_medida','desc_unidad_medida','varchar');
 		$this->setParametro('nandina','nandina','varchar');
 		$this->setParametro('codigo','codigo','VARCHAR');
+		$this->setParametro('codigo_sin','codigo_sin','VARCHAR');//#9
 
 
 		//Ejecuta la instruccion
@@ -187,7 +192,8 @@ class MODSucursalProducto extends MODbase{
 		$this->setParametro('desc_unidad_medida','desc_unidad_medida','varchar');
 		$this->setParametro('nandina','nandina','varchar');
 		$this->setParametro('codigo','codigo','VARCHAR');
-
+		$this->setParametro('codigo_sin','codigo_sin','VARCHAR');//#9
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
