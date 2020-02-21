@@ -7,8 +7,6 @@
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
  * Issue 					Fecha			Author				Descripcion					
  * #1					25/09/2018			EGS					Comentado por que no carga los conceptos de gasto al elegir por entidad
-   #9EndeEtr            18/02/2020          EGS                  Se agrega campo codigo sin
- * 
 */
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -199,7 +197,7 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
                             direction: 'ASC'
                     },
                     totalProperty: 'total',
-                    fields: ['id_concepto_ingas','tipo','desc_ingas','movimiento','desc_partida','id_grupo_ots','filtro_ot','requiere_ot','descripcion_larga','ruta_foto','codigo','nandina','codigo_sin'],
+                    fields: ['id_concepto_ingas','tipo','desc_ingas','movimiento','desc_partida','id_grupo_ots','filtro_ot','requiere_ot','descripcion_larga','ruta_foto','codigo','nandina'],
                     // turn on remote sorting
                     remoteSort: true,
                     baseParams:{par_filtro:'desc_ingas',movimiento:'recurso',start:0,limit:99999}
@@ -303,43 +301,6 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
 			id_grupo:2,
 			grid:true,
 			form:true
-		},
-		{//#9
-			config: {
-				name: 'codigo_sin',
-				fieldLabel: 'Codigo Sin',
-				allowBlank: false,
-				store: new Ext.data.JsonStore({
-					url: '../../sis_siat/control/Producto/listarProducto',
-					id: 'id_producto',
-					root: 'datos',	
-					totalProperty: 'total',
-					fields: ['id_producto', 'codigo'],
-					// turn on remote sorting
-					remoteSort: true,
-					baseParams: {
-						par_filtro: 'id_producto#codigo'
-					}					
-				}),
-				valueField: 'codigo',
-				displayField: 'codigo',
-				gdisplayField: 'codigo',
-				triggerAction: 'all',
-				lazyRender: true,
-				mode: 'remote',
-				pageSize: 10,
-				queryDelay: 200,
-				listWidth:'280',
-				resizable:true,
-				width: 250,
-				minChars: 2,
-				renderer:function(value, p, record){return String.format('{0}', record.data['codigo_sin']);},
-				gwidth:130
-			},
-			type: 'ComboBox',
-			id_grupo: 2,			
-			grid: true,
-			form: true
 		},
 		
 		{
@@ -651,7 +612,6 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
         	this.Cmp.descripcion_producto.setValue(r.data.descripcion_larga);
         	this.Cmp.nandina.setValue(r.data.nandina);
         	this.Cmp.codigo.setValue(r.data.codigo);
-        	this.Cmp.codigo_sin.setValue(r.data.codigo_sin);//#
         	
         	var ruta = '../../../lib/imagenes/noimagen2.jpg';
 			if (r.data['ruta_foto'] && r.data['ruta_foto'] != "") {
@@ -695,8 +655,7 @@ Phx.vista.SucursalProducto=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},'nandina','id_unidad_medida',
-		'desc_unidad_medida','ruta_foto','codigo',
-		{name:'codigo_sin', type: 'string'},//#
+		'desc_unidad_medida','ruta_foto','codigo'
 		
 	],
 	sortInfo:{

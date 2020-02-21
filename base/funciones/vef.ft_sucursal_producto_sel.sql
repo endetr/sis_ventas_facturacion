@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION vef.ft_sucursal_producto_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -21,8 +19,6 @@ $body$
  ISSUE            FECHA:		      AUTOR               DESCRIPCION
  #0              21-04-2015        JRR                 Creacion 
  #123              08/10/2018        RAC                 Logica para listar conceptos de facturas relacionas para notas de credito sobre ventas	
- #9EndeEtr         18/02/2020         EGS                Se agrega campo codigo sin
-
 ***************************************************************************/
 
 DECLARE
@@ -89,8 +85,8 @@ BEGIN
                         um.codigo as desc_unidad_medida,
                         cig.nandina,
                         COALESCE(cig.ruta_foto,'''')::varchar as ruta_foto,
-                        cig.codigo, 
-			            cig.codigo_sin --#9
+                        cig.codigo 
+			
                         
 						from vef.tsucursal_producto sprod
 						inner join segu.tusuario usu1 on usu1.id_usuario = sprod.id_usuario_reg						

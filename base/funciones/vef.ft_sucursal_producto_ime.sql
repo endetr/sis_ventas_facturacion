@@ -1,13 +1,11 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION vef.ft_sucursal_producto_ime (
   p_administrador integer,
   p_id_usuario integer,
   p_tabla varchar,
   p_transaccion varchar
 )
-RETURNS varchar AS
-$body$
+  RETURNS varchar AS
+  $body$
 /**************************************************************************
  SISTEMA:		Sistema de Ventas
  FUNCION: 		vef.ft_sucursal_producto_ime
@@ -17,9 +15,10 @@ $body$
  COMENTARIOS:	
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
-#ISSUE                FECHA                AUTOR                DESCRIPCION
-#9 EndeEtr            20/02/2020            EGS                 Se agrega campo codigo sin y se valida que no este asociado a otro concepto ingas
 
+ DESCRIPCION:	
+ AUTOR:			
+ FECHA:		
 ***************************************************************************/
 
 DECLARE
@@ -35,7 +34,6 @@ DECLARE
     v_id_entidad			integer;
     v_desc_ingas			varchar;
     v_id_sucursal			integer;
-    v_record_cig            record; --#9
 			    
 BEGIN
 
@@ -52,7 +50,6 @@ BEGIN
 	if(p_transaccion='VF_SPROD_INS')then
 					
         begin
-            
         	if (v_parametros.id_sucursal is not null) then         
                 
                 v_id_sucursal = v_parametros.id_sucursal;
@@ -74,7 +71,6 @@ BEGIN
             
             
             if (v_parametros.tipo_producto != 'item_almacen') then
-
                 if (pxp.f_is_positive_integer(v_parametros.nombre_producto)) then
                     v_id_concepto = v_parametros.nombre_producto;
                     
@@ -83,19 +79,6 @@ BEGIN
                     	raise exception 'El producto o servicio ya se encuentra registrado en esta sucursal';
                     end if;
                     
-                    --#9verificamos que el codigo no este asociado a otro concepto ingas al modificar           
-                    SELECT
-                      cig.desc_ingas,
-                      cig.codigo_sin
-                    INTO
-                    v_record_cig
-                    FROM param.tconcepto_ingas cig 
-                    WHERE upper(cig.codigo_sin) = upper(v_parametros.codigo_sin) and cig.id_concepto_ingas <>v_id_concepto;
-
-                    IF v_record_cig is not null THEN
-                        RAISE EXCEPTION 'El codigo Sin (%) ya esta asignado al concepto de ingas % ',v_record_cig.codigo_sin,v_record_cig.desc_ingas;
-                    END IF;
-       
                     update param.tconcepto_ingas
                     set tipo = (case when v_parametros.tipo_producto = 'servicio' then
                       	'Servicio'
@@ -107,22 +90,9 @@ BEGIN
                       id_actividad_economica = v_parametros.id_actividad_economica,
                       id_unidad_medida = v_parametros.id_unidad_medida,
                       nandina = v_parametros.nandina,
-                      codigo = v_parametros.codigo,--
-                      codigo_sin = v_parametros.codigo_sin--#9
+                      codigo = v_parametros.codigo
                     where id_concepto_ingas = v_id_concepto;
                 else
-                    --#9 verificamos que el codigo no este asociado a otro concepto ingas al insertar            
-                    SELECT
-                      cig.desc_ingas,
-                      cig.codigo_sin
-                    INTO
-                    v_record_cig
-                    FROM param.tconcepto_ingas cig 
-                    WHERE upper(cig.codigo_sin) = upper(v_parametros.codigo_sin);
-
-                    IF v_record_cig is not null THEN
-                        RAISE EXCEPTION 'El codigo Sin (%) ya esta asignado al concepto de ingas % ',v_record_cig.codigo_sin,v_record_cig.desc_ingas;
-                    END IF;
                     --insertar el concepto de gasto
                     INSERT INTO 
                       param.tconcepto_ingas
@@ -140,8 +110,7 @@ BEGIN
                       id_actividad_economica,
                       id_unidad_medida,
                       nandina,
-                      codigo,
-                      codigo_sin--#9
+                      codigo
                     )
                     VALUES (
                       p_id_usuario,                  
@@ -161,8 +130,7 @@ BEGIN
                       v_parametros.id_actividad_economica,
                       v_parametros.id_unidad_medida,
                       v_parametros.nandina,
-                      v_parametros.codigo,
-                      v_parametros.codigo_sin--#9
+                      v_parametros.codigo
                     ) returning id_concepto_ingas into v_id_concepto;
                 end if;
             end if;
@@ -225,8 +193,6 @@ BEGIN
 	elsif(p_transaccion='VF_SPROD_MOD')then
 
 		begin
-           
-            
         	if (v_parametros.id_sucursal is not null) then         
                 
                 v_id_sucursal = v_parametros.id_sucursal;
@@ -259,19 +225,6 @@ BEGIN
                                 and id_sucursal_producto != v_parametros.id_sucursal_producto))  then
                     	raise exception 'El producto o servicio ya se encuentra registrado en esta sucursal';
                     end if;
-                    --#9 verificamos que el codigo no este asociado a otro concepto ingas al modificar           
-                    SELECT
-                      cig.desc_ingas,
-                      cig.codigo_sin
-                    INTO
-                    v_record_cig
-                    FROM param.tconcepto_ingas cig 
-                    WHERE upper(cig.codigo_sin) = upper(v_parametros.codigo_sin) and cig.id_concepto_ingas <>v_id_concepto;
-
-                    IF v_record_cig is not null THEN
-                        RAISE EXCEPTION 'El codigo Sin (%) ya esta asignado al concepto de ingas % ',v_record_cig.codigo_sin,v_record_cig.desc_ingas;
-                    END IF;
-                 
                     
                     update param.tconcepto_ingas
                     set tipo = (case when v_parametros.tipo_producto = 'servicio' then
@@ -288,20 +241,6 @@ BEGIN
                 else 
                     
                     if (v_desc_ingas = v_parametros.nombre_producto) then
-                        
-                        --#9 verificamos que el codigo no este asociado a otro concepto ingas al modificar           
-                          SELECT
-                            cig.desc_ingas,
-                            cig.codigo_sin
-                          INTO
-                          v_record_cig
-                          FROM param.tconcepto_ingas cig 
-                          WHERE upper(cig.codigo_sin) = upper(v_parametros.codigo_sin) and cig.id_concepto_ingas <>v_id_concepto;
-
-                          IF v_record_cig is not null THEN
-                              RAISE EXCEPTION 'El codigo Sin (%) ya esta asignado al concepto de ingas % ',v_record_cig.codigo_sin,v_record_cig.desc_ingas;
-                          END IF;
-                                             
                     	update param.tconcepto_ingas
                         set tipo = (case when v_parametros.tipo_producto = 'servicio' then
                             'Servicio'
@@ -313,22 +252,10 @@ BEGIN
                           id_actividad_economica = v_parametros.id_actividad_economica,
                           id_unidad_medida = v_parametros.id_unidad_medida,
                           nandina = v_parametros.nandina,
-                          codigo = v_parametros.codigo,
-                          codigo_sin = v_parametros.codigo_sin--#9
+                          codigo = v_parametros.codigo
                         where id_concepto_ingas = v_id_concepto;
-                    else   
+                    else                    
                     
-                          SELECT
-                            cig.desc_ingas,
-                            cig.codigo_sin
-                          INTO
-                          v_record_cig
-                          FROM param.tconcepto_ingas cig 
-                          WHERE upper(cig.codigo_sin) = upper(v_parametros.codigo_sin);
-
-                          IF v_record_cig is not null THEN
-                              RAISE EXCEPTION 'El codigo Sin (%) ya esta asignado al concepto de ingas % ',v_record_cig.codigo_sin,v_record_cig.desc_ingas;
-                          END IF;
                         --insertar el concepto de gasto
                         INSERT INTO 
                           param.tconcepto_ingas
@@ -345,9 +272,7 @@ BEGIN
                           descripcion_larga,
                           id_actividad_economica,
                           id_unidad_medida,
-                          nandina,
-                          codigo,
-                          codigo_sin--#9
+                          nandina
                         )
                         VALUES (
                           p_id_usuario,                  
@@ -366,9 +291,7 @@ BEGIN
                           v_parametros.descripcion_producto,
                           v_parametros.id_actividad_economica,
                           v_parametros.id_unidad_medida,
-                          v_parametros.nandina,
-                          v_parametros.codigo,
-                          v_parametros.codigo_sin--#9
+                          v_parametros.nandina
                         ) returning id_concepto_ingas into v_id_concepto;
                     end if;
                 end if;
